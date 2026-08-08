@@ -1,16 +1,15 @@
-import customtkinter as crk
+import customtkinter as ctk
 
 
 class LoginView:
-    def _init_(self):
-
+    def __init__(self):
         self.window = ctk.CTk()
 
         self.window.title("GL Secure Manager")
 
         self.window.geometry("500x350")
 
-        self.label = crk.CTkLabel(
+        self.label = ctk.CTkLabel(
             self.window,
             text="GL Secure Manager",
             font=("Arial", 24),
@@ -19,5 +18,4 @@ class LoginView:
         self.label.pack(pady=50)
 
     def run(self):
-
         self.window.mainloop()
