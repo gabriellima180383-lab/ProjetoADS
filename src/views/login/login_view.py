@@ -1,9 +1,11 @@
 import customtkinter as ctk
 
 from src.services.auth_service import AuthService
+from src.views.dashboard.dashboard_view import DashboardView
 
 
 class LoginView:
+
     def __init__(self):
         self.window = ctk.CTk()
 
@@ -56,7 +58,10 @@ class LoginView:
         )
         self.botao_entrar.pack(pady=10)
 
-        self.senha_entry.bind("<Return>", lambda event: self.autenticar())
+        self.senha_entry.bind(
+            "<Return>",
+            lambda event: self.autenticar()
+        )
 
         self.login_entry.focus()
 
@@ -65,23 +70,36 @@ class LoginView:
         senha = self.senha_entry.get()
 
         if not login or not senha:
-            self.mensagem.configure(text="Informe o login e a senha.")
+            self.mensagem.configure(
+                text="Informe o login e a senha."
+            )
             return
 
-        usuario = self.auth_service.autenticar(login, senha)
+        usuario = self.auth_service.autenticar(
+            login,
+            senha
+        )
 
         if usuario:
-            self.mensagem.configure(text=f"Bem-vindo, {usuario['nome']}!")
-
             print("LOGIN REALIZADO COM SUCESSO")
             print(f"Usuário: {usuario['nome']}")
             print(f"Perfil: {usuario['perfil']}")
 
+            self.abrir_dashboard(usuario)
+
         else:
-            self.mensagem.configure(text="Login ou senha inválidos.")
+            self.mensagem.configure(
+                text="Login ou senha inválidos."
+            )
 
             self.senha_entry.delete(0, "end")
             self.senha_entry.focus()
+
+    def abrir_dashboard(self, usuario):
+        self.window.destroy()
+
+        dashboard = DashboardView(usuario)
+        dashboard.run()
 
     def run(self):
         self.window.mainloop()
