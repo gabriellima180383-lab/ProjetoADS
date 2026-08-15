@@ -8,16 +8,19 @@ class UsuarioRepository:
         try:
             cursor = conn.cursor()
 
-            cursor.execute("""
+            cursor.execute(
+                """
                 CREATE TABLE IF NOT EXISTS usuarios (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     nome TEXT NOT NULL,
                     login TEXT NOT NULL,
                     senha TEXT NOT NULL,
                     perfil TEXT NOT NULL DEFAULT 'Operador',
-                    status TEXT NOT NULL DEFAULT 'Ativo'
+                    status TEXT NOT NULL DEFAULT 'Ativo',
+                    foto TEXT
                 )
-            """)
+                """
+            )
 
             conn.commit()
 
@@ -33,8 +36,8 @@ class UsuarioRepository:
             cursor.execute(
                 """
                 INSERT INTO usuarios
-                (nome, login, senha, perfil, status)
-                VALUES (?, ?, ?, ?, ?)
+                (nome, login, senha, perfil, status, foto)
+                VALUES (?, ?, ?, ?, ?, ?)
                 """,
                 (
                     usuario.nome,
@@ -42,6 +45,7 @@ class UsuarioRepository:
                     usuario.senha,
                     usuario.perfil,
                     usuario.status,
+                    usuario.foto,
                 ),
             )
 
@@ -60,7 +64,14 @@ class UsuarioRepository:
 
             cursor.execute(
                 """
-                SELECT id, nome, login, senha, perfil, status
+                SELECT
+                    id,
+                    nome,
+                    login,
+                    senha,
+                    perfil,
+                    status,
+                    foto
                 FROM usuarios
                 WHERE id = ?
                 """,
@@ -85,7 +96,14 @@ class UsuarioRepository:
 
             cursor.execute(
                 """
-                SELECT id, nome, login, senha, perfil, status
+                SELECT
+                    id,
+                    nome,
+                    login,
+                    senha,
+                    perfil,
+                    status,
+                    foto
                 FROM usuarios
                 WHERE login = ?
                 """,
@@ -108,11 +126,19 @@ class UsuarioRepository:
         try:
             cursor = conn.cursor()
 
-            cursor.execute("""
-                SELECT id, nome, login, senha, perfil, status
+            cursor.execute(
+                """
+                SELECT
+                    id,
+                    nome,
+                    login,
+                    perfil,
+                    status,
+                    foto
                 FROM usuarios
                 ORDER BY nome
-            """)
+                """
+            )
 
             usuarios = cursor.fetchall()
 
@@ -134,7 +160,8 @@ class UsuarioRepository:
                     login = ?,
                     senha = ?,
                     perfil = ?,
-                    status = ?
+                    status = ?,
+                    foto = ?
                 WHERE id = ?
                 """,
                 (
@@ -143,6 +170,7 @@ class UsuarioRepository:
                     usuario.senha,
                     usuario.perfil,
                     usuario.status,
+                    usuario.foto,
                     usuario_id,
                 ),
             )

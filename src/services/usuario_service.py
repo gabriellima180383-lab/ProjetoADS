@@ -4,7 +4,6 @@ from src.services.auth_service import AuthService
 
 
 class UsuarioService:
-
     def __init__(self):
         self.repository = UsuarioRepository()
 
@@ -14,7 +13,15 @@ class UsuarioService:
     def buscar_por_id(self, usuario_id):
         return self.repository.buscar_por_id(usuario_id)
 
-    def criar(self, nome, login, senha, perfil="Operador", status="Ativo"):
+    def criar(
+        self,
+        nome,
+        login,
+        senha,
+        perfil="Operador",
+        status="Ativo",
+        foto=None,
+    ):
         nome = nome.strip()
         login = login.strip()
 
@@ -38,6 +45,7 @@ class UsuarioService:
             senha=senha_hash,
             perfil=perfil,
             status=status,
+            foto=foto,
         )
 
         return self.repository.inserir(usuario)
@@ -50,6 +58,7 @@ class UsuarioService:
         senha=None,
         perfil="Operador",
         status="Ativo",
+        foto=None,
     ):
         nome = nome.strip()
         login = login.strip()
@@ -75,23 +84,57 @@ class UsuarioService:
         else:
             senha_hash = usuario_atual["senha"]
 
+        # Se nenhuma foto nova foi escolhida,
+        # mantém a foto que já estava cadastrada.
+        if foto is None:
+            foto = usuario_atual["foto"]
+
         usuario = Usuario(
             nome=nome,
             login=login,
             senha=senha_hash,
             perfil=perfil,
             status=status,
+            foto=foto,
         )
 
-        return self.repository.atualizar(usuario_id, usuario)
+        return self.repository.atualizar(
+            usuario_id,
+            usuario,
+        )
 
-    def excluir(self, usuario_id):
+    def excluir(
+        self,
+        usuario_id,
+        login_autorizador,
+        senha_autorizacao,
+    ):
         usuario = self.repository.buscar_por_id(usuario_id)
 
         if not usuario:
             raise ValueError("Usuário não encontrado.")
 
+        # Proteção do administrador principal.
         if usuario["login"] == "admin":
             raise ValueError("O usuário administrador principal não pode ser excluído.")
+
+        # Busca quem está autorizando a operação.
+        autorizador = self.repository.buscar_por_login(
+            login_autorizador,
+        )
+
+        if not autorizador:
+            raise ValueError("Usuário autorizador não encontrado.")
+
+        # Usuário inativo não pode autorizar operações.
+        if autorizador["status"] != "Ativo":
+            raise ValueError("O usuário autorizador está inativo.")
+
+        # Valida a senha contra o hash armazenado.
+        if not AuthService.verificar_senha(
+            senha_autorizacao,
+            autorizador["senha"],
+        ):
+            raise ValueError("Senha de autorização inválida.")
 
         return self.repository.excluir(usuario_id)

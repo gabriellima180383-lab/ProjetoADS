@@ -2,23 +2,41 @@ from src.config.database import get_connection
 
 
 class ColaboradorRepository:
-
     def criar_tabela(self):
         conn = get_connection()
 
         try:
             cursor = conn.cursor()
 
-            cursor.execute("""
+            cursor.execute(
+                """
                 CREATE TABLE IF NOT EXISTS colaboradores (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     nome TEXT NOT NULL,
                     matricula TEXT NOT NULL UNIQUE,
                     cargo TEXT NOT NULL,
                     setor TEXT,
-                    status TEXT DEFAULT 'Ativo'
+                    status TEXT NOT NULL DEFAULT 'Ativo',
+                    foto TEXT
                 )
-            """)
+                """
+            )
+
+            # ==================================================
+            # MIGRAÇÃO
+            # ==================================================
+
+            cursor.execute("PRAGMA table_info(colaboradores)")
+
+            colunas = [coluna["name"] for coluna in cursor.fetchall()]
+
+            if "foto" not in colunas:
+                cursor.execute(
+                    """
+                    ALTER TABLE colaboradores
+                    ADD COLUMN foto TEXT
+                    """
+                )
 
             conn.commit()
 
@@ -31,17 +49,28 @@ class ColaboradorRepository:
         try:
             cursor = conn.cursor()
 
-            cursor.execute("""
+            cursor.execute(
+                """
                 INSERT INTO colaboradores
-                (nome, matricula, cargo, setor, status)
-                VALUES (?, ?, ?, ?, ?)
-            """, (
-                colaborador.nome,
-                colaborador.matricula,
-                colaborador.cargo,
-                colaborador.setor,
-                colaborador.status
-            ))
+                (
+                    nome,
+                    matricula,
+                    cargo,
+                    setor,
+                    status,
+                    foto
+                )
+                VALUES (?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    colaborador.nome,
+                    colaborador.matricula,
+                    colaborador.cargo,
+                    colaborador.setor,
+                    colaborador.status,
+                    colaborador.foto,
+                ),
+            )
 
             conn.commit()
 
@@ -56,11 +85,20 @@ class ColaboradorRepository:
         try:
             cursor = conn.cursor()
 
-            cursor.execute("""
-                SELECT id, nome, matricula, cargo, setor, status
+            cursor.execute(
+                """
+                SELECT
+                    id,
+                    nome,
+                    matricula,
+                    cargo,
+                    setor,
+                    status,
+                    foto
                 FROM colaboradores
                 ORDER BY nome
-            """)
+                """
+            )
 
             return cursor.fetchall()
 
@@ -73,11 +111,21 @@ class ColaboradorRepository:
         try:
             cursor = conn.cursor()
 
-            cursor.execute("""
-                SELECT id, nome, matricula, cargo, setor, status
+            cursor.execute(
+                """
+                SELECT
+                    id,
+                    nome,
+                    matricula,
+                    cargo,
+                    setor,
+                    status,
+                    foto
                 FROM colaboradores
                 WHERE id = ?
-            """, (colaborador_id,))
+                """,
+                (colaborador_id,),
+            )
 
             return cursor.fetchone()
 
@@ -90,22 +138,28 @@ class ColaboradorRepository:
         try:
             cursor = conn.cursor()
 
-            cursor.execute("""
+            cursor.execute(
+                """
                 UPDATE colaboradores
-                SET nome = ?,
+                SET
+                    nome = ?,
                     matricula = ?,
                     cargo = ?,
                     setor = ?,
-                    status = ?
+                    status = ?,
+                    foto = ?
                 WHERE id = ?
-            """, (
-                colaborador.nome,
-                colaborador.matricula,
-                colaborador.cargo,
-                colaborador.setor,
-                colaborador.status,
-                colaborador_id
-            ))
+                """,
+                (
+                    colaborador.nome,
+                    colaborador.matricula,
+                    colaborador.cargo,
+                    colaborador.setor,
+                    colaborador.status,
+                    colaborador.foto,
+                    colaborador_id,
+                ),
+            )
 
             conn.commit()
 
@@ -120,10 +174,13 @@ class ColaboradorRepository:
         try:
             cursor = conn.cursor()
 
-            cursor.execute("""
+            cursor.execute(
+                """
                 DELETE FROM colaboradores
                 WHERE id = ?
-            """, (colaborador_id,))
+                """,
+                (colaborador_id,),
+            )
 
             conn.commit()
 

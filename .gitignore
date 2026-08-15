@@ -1,27 +1,11 @@
-# Ambiente virtual
 .venv/
-venv/
-env/
-
-# Python
 __pycache__/
-*.py[cod]
-*$py.class
+*.pyc
+*.pyo
 
-# Banco de dados
-database/*.db
+fotos/
+src/views/colaboradores/fotos/
 
-# IDE
-.vscode/
-.idea/
-
-# Sistema operacional
-Thumbs.db
-Desktop.ini
-
-# Logs
-*.log
-
-# Arquivos temporários
-*.tmp
-*.temp
+*.db
+*.sqlite
+*.sqlite3

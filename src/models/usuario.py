@@ -1,18 +1,19 @@
 class Usuario:
-
     def __init__(
         self,
         nome,
         login,
         senha,
         perfil="Administrador",
-        status="Ativo"
+        status="Ativo",
+        foto=None,
     ):
         self.nome = nome
         self.login = login
         self.senha = senha
         self.perfil = perfil
         self.status = status
+        self.foto = foto
 
     def autenticar(self):
         return True

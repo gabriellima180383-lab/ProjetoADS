@@ -5,7 +5,6 @@ from src.views.dashboard.dashboard_view import DashboardView
 
 
 class LoginView:
-
     def __init__(self):
         self.window = ctk.CTk()
 
@@ -18,12 +17,16 @@ class LoginView:
         self.criar_interface()
 
     def criar_interface(self):
+
         self.titulo = ctk.CTkLabel(
             self.window,
             text="GL Secure Manager",
             font=("Arial", 26, "bold"),
         )
-        self.titulo.pack(pady=(40, 30))
+
+        self.titulo.pack(
+            pady=(40, 30),
+        )
 
         self.login_entry = ctk.CTkEntry(
             self.window,
@@ -31,7 +34,10 @@ class LoginView:
             height=40,
             placeholder_text="Login",
         )
-        self.login_entry.pack(pady=10)
+
+        self.login_entry.pack(
+            pady=10,
+        )
 
         self.senha_entry = ctk.CTkEntry(
             self.window,
@@ -40,14 +46,20 @@ class LoginView:
             placeholder_text="Senha",
             show="*",
         )
-        self.senha_entry.pack(pady=10)
+
+        self.senha_entry.pack(
+            pady=10,
+        )
 
         self.mensagem = ctk.CTkLabel(
             self.window,
             text="",
             font=("Arial", 14),
         )
-        self.mensagem.pack(pady=(10, 5))
+
+        self.mensagem.pack(
+            pady=(10, 5),
+        )
 
         self.botao_entrar = ctk.CTkButton(
             self.window,
@@ -56,28 +68,32 @@ class LoginView:
             text="ENTRAR",
             command=self.autenticar,
         )
-        self.botao_entrar.pack(pady=10)
+
+        self.botao_entrar.pack(
+            pady=10,
+        )
 
         self.senha_entry.bind(
             "<Return>",
-            lambda event: self.autenticar()
+            lambda event: self.autenticar(),
         )
 
         self.login_entry.focus()
 
     def autenticar(self):
+
         login = self.login_entry.get().strip()
         senha = self.senha_entry.get()
 
         if not login or not senha:
             self.mensagem.configure(
-                text="Informe o login e a senha."
+                text="Informe o login e a senha.",
             )
             return
 
         usuario = self.auth_service.autenticar(
             login,
-            senha
+            senha,
         )
 
         if usuario:
@@ -85,21 +101,27 @@ class LoginView:
             print(f"Usuário: {usuario['nome']}")
             print(f"Perfil: {usuario['perfil']}")
 
-            self.abrir_dashboard(usuario)
+            self.window.withdraw()
+
+            self.dashboard = DashboardView(
+                master=self.window,
+                usuario=usuario,
+            )
 
         else:
             self.mensagem.configure(
-                text="Login ou senha inválidos."
+                text="Login ou senha inválidos.",
             )
 
-            self.senha_entry.delete(0, "end")
+            self.senha_entry.delete(
+                0,
+                "end",
+            )
+
             self.senha_entry.focus()
 
-    def abrir_dashboard(self, usuario):
+    def sair(self):
         self.window.destroy()
-
-        dashboard = DashboardView(usuario)
-        dashboard.run()
 
     def run(self):
         self.window.mainloop()

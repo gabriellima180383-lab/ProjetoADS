@@ -5,7 +5,9 @@ from src.config.settings import DATABASE_PATH
 
 def get_connection():
     connection = sqlite3.connect(DATABASE_PATH)
+
     connection.row_factory = sqlite3.Row
+
     return connection
 
 
@@ -15,6 +17,10 @@ def create_database():
     try:
         cursor = connection.cursor()
 
+        # ==================================================
+        # USUÁRIOS
+        # ==================================================
+
         cursor.execute(
             """
             CREATE TABLE IF NOT EXISTS usuarios (
@@ -23,10 +29,31 @@ def create_database():
                 login TEXT NOT NULL,
                 senha TEXT NOT NULL,
                 perfil TEXT NOT NULL,
-                status TEXT NOT NULL DEFAULT 'Ativo'
+                status TEXT NOT NULL DEFAULT 'Ativo',
+                foto TEXT
             )
             """
         )
+
+        # ==================================================
+        # MIGRAÇÃO DA TABELA USUÁRIOS
+        # ==================================================
+
+        cursor.execute("PRAGMA table_info(usuarios)")
+
+        colunas_usuarios = [coluna["name"] for coluna in cursor.fetchall()]
+
+        if "foto" not in colunas_usuarios:
+            cursor.execute(
+                """
+                ALTER TABLE usuarios
+                ADD COLUMN foto TEXT
+                """
+            )
+
+        # ==================================================
+        # COLABORADORES
+        # ==================================================
 
         cursor.execute(
             """
@@ -36,10 +63,27 @@ def create_database():
                 matricula TEXT NOT NULL UNIQUE,
                 cargo TEXT NOT NULL,
                 setor TEXT,
-                status TEXT NOT NULL
+                status TEXT NOT NULL DEFAULT 'Ativo',
+                foto TEXT
             )
             """
         )
+
+        # ==================================================
+        # MIGRAÇÃO DA TABELA COLABORADORES
+        # ==================================================
+
+        cursor.execute("PRAGMA table_info(colaboradores)")
+
+        colunas_colaboradores = [coluna["name"] for coluna in cursor.fetchall()]
+
+        if "foto" not in colunas_colaboradores:
+            cursor.execute(
+                """
+                ALTER TABLE colaboradores
+                ADD COLUMN foto TEXT
+                """
+            )
 
         connection.commit()
 
