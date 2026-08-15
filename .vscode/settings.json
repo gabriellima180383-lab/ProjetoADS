@@ -1,0 +1,23 @@
+{
+    "editor.defaultFormatter": "charliermarsh.ruff",
+    "editor.formatOnSave": true,
+
+    "[python]": {
+        "editor.defaultFormatter": "charliermarsh.ruff",
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+            "source.fixAll": "explicit",
+            "source.organizeImports": "explicit"
+        }
+    },
+
+    "ruff.format.args": [
+        "--line-length",
+        "88"
+    ],
+
+    "ruff.lint.args": [
+        "--line-length",
+        "88"
+    ]
+}

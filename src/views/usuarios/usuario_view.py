@@ -1,4 +1,4 @@
-from tkinter import ttk
+from tkinter import filedialog, ttk
 
 import customtkinter as ctk
 
@@ -11,6 +11,7 @@ class UsuarioView:
         self.usuario = usuario
         self.service = UsuarioService()
         self.usuario_selecionado = None
+        self.foto_novo = None
 
         self.window = ctk.CTkToplevel(master)
 
@@ -240,6 +241,8 @@ class UsuarioView:
 
     def novo_usuario(self):
 
+        self.foto_novo = None
+
         self.janela_novo = ctk.CTkToplevel(
             self.window,
         )
@@ -249,7 +252,7 @@ class UsuarioView:
         )
 
         self.janela_novo.geometry(
-            "500x550",
+            "500x600",
         )
 
         self.janela_novo.resizable(
@@ -344,6 +347,36 @@ class UsuarioView:
             "Ativo",
         )
 
+        # ==========================
+        # FOTO
+        # ==========================
+
+        self.foto_novo_label = ctk.CTkLabel(
+            self.janela_novo,
+            text="Nenhuma foto selecionada",
+            font=("Arial", 13),
+        )
+
+        self.foto_novo_label.pack(
+            pady=(15, 5),
+        )
+
+        self.botao_foto_novo = ctk.CTkButton(
+            self.janela_novo,
+            width=350,
+            height=40,
+            text="SELECIONAR FOTO",
+            command=self.selecionar_foto_novo,
+        )
+
+        self.botao_foto_novo.pack(
+            pady=5,
+        )
+
+        # ==========================
+        # MENSAGEM
+        # ==========================
+
         self.mensagem_novo = ctk.CTkLabel(
             self.janela_novo,
             text="",
@@ -353,6 +386,10 @@ class UsuarioView:
         self.mensagem_novo.pack(
             pady=(10, 5),
         )
+
+        # ==========================
+        # SALVAR
+        # ==========================
 
         self.botao_salvar = ctk.CTkButton(
             self.janela_novo,
@@ -367,6 +404,31 @@ class UsuarioView:
         )
 
         self.nome_entry.focus()
+
+    def selecionar_foto_novo(self):
+
+        caminho = filedialog.askopenfilename(
+            title="Selecionar foto do usuário",
+            filetypes=[
+                (
+                    "Imagens",
+                    "*.jpg *.jpeg *.png *.gif",
+                ),
+                (
+                    "Todos os arquivos",
+                    "*.*",
+                ),
+            ],
+        )
+
+        if not caminho:
+            return
+
+        self.foto_novo = caminho
+
+        self.foto_novo_label.configure(
+            text=caminho,
+        )
 
     def salvar_novo_usuario(self):
 
@@ -383,6 +445,7 @@ class UsuarioView:
                 senha=senha,
                 perfil=perfil,
                 status=status,
+                foto=self.foto_novo,
             )
 
             print(f"Usuário criado com sucesso. ID: {usuario_id}")
